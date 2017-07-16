@@ -1,3 +1,6 @@
 [submodule "pigpio"]
 	path = pigpio
 	url = https://github.com/joan2937/pigpio
+[submodule "Xbox"]
+	path = Xbox
+	url = git@github.com:FRC4564/Xbox.git
