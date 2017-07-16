@@ -4,6 +4,8 @@ import tty, sys
 import pigpio
 import time
 import math
+import argparse
+import cv2
 import Xbox.xbox as xbox
 
 ENA = 26
@@ -58,43 +60,56 @@ def stop(pi):
     pi.write(IN4, 0)
 
 
-def update_speed(angle, throttle):
+def update_speed(x, y):
     global SPEED_LEFT
     global SPEED_RIGHT
 
-    if throttle < 0: throttle = 0
-
-    throttle = math.sqrt(throttle * throttle + angle * angle)
-    
+    if y < 0: y = 0
+    throttle = math.sqrt(x*x + y*y)
+    angle = x
     avg_speed = MAX_SPEED * throttle
 
     SPEED_RIGHT = (1 - angle) * avg_speed
     SPEED_LEFT = (1 + angle) * avg_speed
 
-
     if SPEED_LEFT < 0: SPEED_LEFT = 0
     if SPEED_LEFT > MAX_SPEED: SPEED_LEFT = MAX_SPEED
     if SPEED_RIGHT < 0 : SPEED_RIGHT = 0
-    if SPEED_RIGHT > MAX_SPEED: SPEED_RIGHT = MAX_SPEED
-    
+    if SPEED_RIGHT > MAX_SPEED: SPEED_RIGHT = MAX_SPEED    
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--record', action='store_true')
+    args = parser.parse_args()
+        
     pi = pigpio.pi()
     if pi.connected:
         try:
             init(pi)
             joy = xbox.Joystick()
+            if args.record:
+                cap = cv2.VideoCapture(0)
+                fourcc = cv2.cv.CV_FOURCC(*'DIVX')
+                out = cv2.VideoWriter('/home/pi/rc_car/recording.avi', fourcc, 50.0, (640,480))
+
             while True:
-                (angle, throttle) = joy.rightStick()
-                update_speed(angle, throttle)
+                if args.record:
+                    if cap.isOpened():
+                        ret, frame = cap.read()
+                        if ret: out.write(frame)
+                (x, y) = joy.rightStick()
+                update_speed(x, y)
                 move(pi)
-                time.sleep(0.05)
+                time.sleep(0.02)
 
         finally:
             stop(pi)
             pi.stop()
             joy.close()
+            if args.record:
+                cap.release()
+                out.release()
     else:
         print "Not connected to daemon, stop"
         exit()
