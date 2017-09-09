@@ -1,0 +1,1 @@
+/Users/dprylipko/Work/rc_car/data/01_HellaVentures/hdf5_1ch_320x240/train.h5
