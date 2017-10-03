@@ -7,22 +7,18 @@ import caffe
 import numpy as np
 import cv2
 
-def draw_pred(frame, w, h, x_gt, x_pred):
-    center_x = w/2
-    center_y = h - 10
-    bar_h = 10
-    bar_max_w = 80
-    color_gt = (0, 255, 0)
-    color_pred = (255, 0, 0)
-    bar_gt_w = int(bar_max_w * -x_gt)
-    if bar_gt_w == 0: bar_gt_w = 1
-    bar_pred_w = int(bar_max_w * -x_pred)
-    if bar_pred_w == 0: bar_pred_w = 1
-    print "x_gt=%.2f, x_pred=%.2f" % (x_gt, x_pred)
-    bar_gt = [[center_x - bar_gt_w, center_y - bar_h], [center_x, center_y - bar_h], [center_x, center_y], [center_x - bar_gt_w, center_y]]
-    bar_pred = [[center_x - bar_pred_w, center_y], [center_x, center_y], [center_x, center_y + bar_h], [center_x - bar_pred_w, center_y + bar_h]]
-    cv2.fillConvexPoly(frame, np.asarray(bar_gt), (0, 255, 0))
-    cv2.fillConvexPoly(frame, np.asarray(bar_pred), 2)
+def draw_pred(frame, w, h, gt, pred):
+    center = (int(w/2), int(h - 50))
+    max_r = 50
+    cv2.circle(frame, center, max_r, (0, 0, 0))
+    cv2.circle(frame, center, 1, (0, 0, 0))
+
+    gt_point = ( int(center[0] +  max_r * gt[0]), int(center[1] - max_r * gt[1]))
+    pred_point = ( int(center[0] +  max_r * pred[0]), int(center[1] - max_r * pred[1]))
+
+    cv2.circle(frame, gt_point, 2, (0, 0, 0), 2)
+    cv2.circle(frame, pred_point, 2, (255, 255, 255), 2)
+
     return frame
 
 if __name__ == '__main__':
@@ -42,10 +38,10 @@ if __name__ == '__main__':
     num = data.shape[0]
     for i in range(num):
         frame = data[i, :, :, :]
-        gt = labels[i]
+        gt = labels[i, :]
         net.blobs['data'].data[...] = frame
         out = net.forward()
-        frame = draw_pred(frame[0, :, :], imwidth, imheight, gt, out['fc2'][0][0])
+        frame = draw_pred(frame[0, :, :], imwidth, imheight, gt, out['pred'][0])
         cv2.imshow('Prediction', frame)
         cv2.waitKey(200)
 
