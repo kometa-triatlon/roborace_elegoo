@@ -1,7 +1,7 @@
 # The training protocol buffer definition
 net: "trainval.prototxt"
-test_iter: 5
-test_interval: 51
+test_iter: 4
+test_interval: 55
 base_lr: 0.001
 weight_decay : 0.0005
 type : "Adam"
@@ -9,10 +9,10 @@ momentum: 0.9
 momentum2: 0.999
 lr_policy: "step"
 gamma: 0.5
-stepsize: 150
-display: 51
+stepsize: 55
+display: 55
 max_iter: 1000
 # snapshot intermediate results
-snapshot: 50
-snapshot_prefix: "exp/caffe_xy_pred"
+snapshot: 110
+snapshot_prefix: "train/caffe_xy_pred"
 solver_mode: GPU

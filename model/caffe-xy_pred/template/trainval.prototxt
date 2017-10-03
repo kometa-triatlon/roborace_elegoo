@@ -38,7 +38,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 16
+    num_output: 8
     kernel_size: 7
     stride: 2
     weight_filler {
@@ -85,7 +85,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 32
+    num_output: 16
     kernel_size: 5
     stride: 1
     weight_filler {
@@ -131,7 +131,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 64
+    num_output: 32
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -177,7 +177,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 128
+    num_output: 64
     kernel_size: 3
     stride: 1
     weight_filler {
@@ -223,7 +223,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 512
+    num_output: 128
     weight_filler {
       type: "xavier"
     }
@@ -233,6 +233,7 @@ layer {
     }
   }
 }
+
 layer {
   name: "dropout5"
   type: "Dropout"
@@ -244,10 +245,45 @@ layer {
 }
 
 layer {
-  name: "pred"
+  name: "fc2"
   type: "InnerProduct"
   bottom: "fc1"
-  top: "pred"
+  top: "fc2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 32
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "dropout6"
+  type: "Dropout"
+  bottom: "fc2"
+  top: "fc2"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
+layer {
+  name: "fc3"
+  type: "InnerProduct"
+  bottom: "fc2"
+  top: "fc3"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -266,6 +302,13 @@ layer {
       value: 0
     }
   }
+}
+
+layer {
+  name: "pred"
+  type: "TanH"
+  bottom: "fc3"
+  top: "pred"
 }
 
 layer {
