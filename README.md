@@ -1,1 +1,3 @@
-Code to control a toy autonomous car
+Autonomous race car project based upon the Elegoo Smart Robot Car Kit V2.0.
+
+See it in action at the Berlin Self Driving Car and Autonomous Vehicles event:  https://youtu.be/iM7jmKlneUk
